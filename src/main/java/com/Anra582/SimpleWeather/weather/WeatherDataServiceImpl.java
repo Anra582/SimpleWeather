@@ -1,6 +1,5 @@
 package com.Anra582.SimpleWeather.weather;
 
-import com.Anra582.SimpleWeather.SimpleWeatherApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,19 +19,21 @@ public class WeatherDataServiceImpl implements WeatherDataService {
     public WeatherDataServiceImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         logger.debug("Updating table Weather.");
-        this.jdbcTemplate.update("CREATE TABLE IF NOT EXISTS Weather (weatherText text);");
+        this.jdbcTemplate.update("CREATE TABLE IF NOT EXISTS Weather (sample text);");
         logger.debug("Update successful");
     }
 
 
     @Override
-    public void save(String weatherText) {
-        jdbcTemplate.update("insert into Weather (weatherText) values (?)", weatherText);
+    public void save(String weatherSample) {
+        logger.debug(String.format("Saving weather sample {%s} into table", weatherSample));
+        jdbcTemplate.update("insert into Weather (sample) values (?)", weatherSample);
+        logger.debug("Saved");
     }
 
     @Override
     public List<String> getAll() {
-        return jdbcTemplate.query("select weatherText from Weather",
-                (rs, rowNum) -> rs.getString("weatherText"));
+        return jdbcTemplate.query("select sample from Weather",
+                (rs, rowNum) -> rs.getString("sample"));
     }
 }

@@ -15,9 +15,9 @@ import java.net.URI;
 @Service
 public class RestWeatherRetriever implements WeatherRetriever {
 
-    private final String URL_COMMUNITY_OPEN_WEATHER = "https://community-open-weather-map.p.rapidapi.com/weather?units=metric&mode=json&q=";
-    private final String X_RAPIDAPI_HOST = "community-open-weather-map.p.rapidapi.com";
-    private final String X_RAPIDAPI_KEY = "b76c131aa4msh861b05768650d7ap163401jsn9ce105d42c36";
+    private static final String URL_COMMUNITY_OPEN_WEATHER = "https://community-open-weather-map.p.rapidapi.com/weather?units=metric&mode=json&q=";
+    private static final String X_RAPIDAPI_HOST = "community-open-weather-map.p.rapidapi.com";
+    private static final String X_RAPIDAPI_KEY = "b76c131aa4msh861b05768650d7ap163401jsn9ce105d42c36";
 
 
     private final Logger logger = LoggerFactory.getLogger(RestWeatherRetriever.class);
@@ -31,7 +31,6 @@ public class RestWeatherRetriever implements WeatherRetriever {
     @Override
     public WeatherImportDTO getWeather(String city) {
 
-        System.out.println("Hi, you're in getWeather()");
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add("x-rapidapi-host" , X_RAPIDAPI_HOST);
         headers.add("x-rapidapi-key", X_RAPIDAPI_KEY);
@@ -39,21 +38,20 @@ public class RestWeatherRetriever implements WeatherRetriever {
         WeatherImportDTO weatherImportDTO;
 
         try {
-            System.out.println(URI.create(URL_COMMUNITY_OPEN_WEATHER + city).toString());
+            logger.debug("Trying to get weather from city: " + city);
+
+            weatherImportDTO = restTemplate.exchange(URI.create(URL_COMMUNITY_OPEN_WEATHER + city),
+                    HttpMethod.GET, new HttpEntity<>(headers), WeatherImportDTO.class).getBody();
 
 
-            HttpEntity<String> response = restTemplate.exchange(URI.create(URL_COMMUNITY_OPEN_WEATHER + city),
-                    HttpMethod.GET, new HttpEntity<>(headers), String.class);
-
-            System.out.println(response.getBody());
 
         } catch (RestClientException e) {
             e.printStackTrace();
+            logger.debug("Something went wrong. Check name of city");
+            return null;
         }
 
-
-
-
-        return null;
+        logger.debug(String.format("Successful. City: %s, Temperature: %s", weatherImportDTO.getName(), weatherImportDTO.getMain().getTemp()));
+        return weatherImportDTO;
     }
 }
