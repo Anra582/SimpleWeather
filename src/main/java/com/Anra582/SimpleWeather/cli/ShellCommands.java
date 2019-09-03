@@ -21,13 +21,18 @@ public class ShellCommands {
     }
 
     @ShellMethod("Show all samples")
-    public List<String> showall() {
+    public List<String> showAll() {
         return weatherDataService.getAll();
     }
 
     @ShellMethod("Get current weather in city")
     public String get(@ShellOption(defaultValue = "Krasnoyarsk") String city) {
         WeatherImportDTO weatherImportDTO = restWeatherRetriever.getWeather(city);
+
+        if (weatherImportDTO == null)
+        {
+            return "Cannot find city " + city;
+        }
 
         weatherDataService.save(weatherImportDTO.toString());
         return String.format("Current temperature in %s is %s ", weatherImportDTO.getName(), weatherImportDTO.getMain().getTemp());

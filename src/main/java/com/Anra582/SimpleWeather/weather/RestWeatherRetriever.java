@@ -46,8 +46,7 @@ public class RestWeatherRetriever implements WeatherRetriever {
 
 
         } catch (RestClientException e) {
-            e.printStackTrace();
-            logger.debug("Something went wrong. Check name of city");
+            logger.debug(String.valueOf(e));
             return null;
         }
 
